@@ -1,5 +1,5 @@
 // Modo offline: busca sempre a versão mais nova na rede e, sem conexão, usa a cópia guardada.
-const CACHE = "plano-v1";
+const CACHE = "plano-v2";
 const SHELL = ["./", "index.html", "app.js", "config.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
