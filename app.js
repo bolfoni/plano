@@ -4,22 +4,6 @@ const DOW=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const IV0=[{d:1,rm:15,qm:15},{d:7,rm:15,qm:15},{d:15,rm:15,qm:15},{d:30,rm:15,qm:15}];
 const HOURS0=[4,2,2,2,2,2,4];
 const KIND={p:"PDF",r:"Revisão",q:"Questões",s:"Simulado"};
-const SEED=[
-["Direito Civil",["LINDB e Parte Geral","Prescrição e decadência","Obrigações","Contratos em geral","Contratos em espécie","Responsabilidade civil","Posse e propriedade","Direitos reais sobre coisa alheia","Família","Sucessões"]],
-["Direito Processual Civil",["Normas fundamentais e jurisdição","Competência","Sujeitos do processo e litisconsórcio","Tutela provisória","Petição inicial e resposta do réu","Provas","Sentença e coisa julgada","Recursos","Precedentes e IRDR","Cumprimento de sentença e execução","Procedimentos especiais","Juizados Especiais"]],
-["Direito Penal",["Princípios e aplicação da lei penal","Teoria do crime: fato típico","Ilicitude e culpabilidade","Concurso de pessoas e de crimes","Penas e dosimetria","Extinção da punibilidade e prescrição","Crimes contra a pessoa","Crimes contra o patrimônio","Crimes contra a dignidade sexual","Crimes contra a administração pública","Lei de Drogas","Legislação penal especial"]],
-["Direito Processual Penal",["Princípios e aplicação da lei processual","Inquérito policial e investigação","Ação penal e ANPP","Competência","Provas","Prisões e medidas cautelares","Procedimentos","Tribunal do Júri","Sentença e nulidades","Recursos e ações autônomas","Execução penal"]],
-["Direito Constitucional",["Teoria da Constituição e poder constituinte","Direitos e garantias fundamentais","Remédios constitucionais","Organização do Estado e competências","Poder Legislativo e processo legislativo","Poder Executivo","Poder Judiciário e CNJ","Controle de constitucionalidade","Funções essenciais à justiça","Ordem econômica e social"]],
-["Direito Administrativo",["Princípios e organização administrativa","Poderes e atos administrativos","Licitações e contratos","Serviços públicos e concessões","Agentes públicos","Improbidade administrativa","Responsabilidade civil do Estado","Controle da administração","Intervenção na propriedade"]],
-["Direito do Consumidor",["Relação de consumo e princípios","Responsabilidade pelo fato e pelo vício","Práticas comerciais e publicidade","Proteção contratual e cláusulas abusivas","Superendividamento","Defesa do consumidor em juízo"]],
-["Criança e Adolescente",["Proteção integral e direitos fundamentais","Guarda, tutela e adoção","Medidas de proteção","Ato infracional e medidas socioeducativas","Conselho Tutelar e acesso à justiça","Crimes e infrações administrativas"]],
-["Direito Eleitoral",["Princípios e Justiça Eleitoral","Direitos políticos e inelegibilidades","Partidos políticos","Registro de candidatura e propaganda","Ações eleitorais","Crimes eleitorais"]],
-["Direito Empresarial",["Empresário e estabelecimento","Sociedades limitada e anônima","Títulos de crédito","Contratos empresariais","Recuperação judicial e falência","Propriedade industrial"]],
-["Direito Tributário e Financeiro",["Sistema tributário e competência","Limitações ao poder de tributar","Obrigação e crédito tributário","Suspensão, extinção e exclusão do crédito","Impostos estaduais e municipais","Execução fiscal e processo tributário","Orçamento e responsabilidade fiscal"]],
-["Direito Ambiental",["Princípios e competências ambientais","Licenciamento e política nacional do meio ambiente","Código Florestal e unidades de conservação","Responsabilidade civil, administrativa e penal"]],
-["Formação Humanística",["Sociologia do Direito","Psicologia judiciária","Ética e Estatuto da Magistratura","Filosofia do Direito","Teoria Geral do Direito e da Política"]],
-["Direitos Humanos",["Teoria geral e sistema global","Sistema interamericano","Controle de convencionalidade","Grupos vulneráveis e protocolos do CNJ"]]
-];
 
 let L=null,S=null,proj={},moved=0;
 const ui={tab:"hoje",wk:0,openSub:null,openG:{},edit:null,confirm:null,draft:null,exp:null,msg:""};
@@ -52,16 +36,6 @@ function mkRv(iv){
 
 /* ---------- cursos ---------- */
 function emptyCourse(n){return {v:3,rev:0,n:n,seq:0,sq:0,na:4,rc:60,ad:1,al:60,ah:85,pf:25,ps:5,pl:15,rt:[],sm:[],off:[],log:{},tp:0,ta:0,tn:0,start:today(),hours:HOURS0.slice(),iv:clone(IV0),subs:[],topics:[]}}
-function exampleCourse(){
-  const s=emptyCourse("Magistratura estadual (exemplo)");
-  s.start="2027-05-03";
-  SEED.forEach((x,i)=>{
-    const id="s"+(s.sq++);
-    s.subs.push({id:id,n:x[0],c:i%6,w:1});
-    x[1].forEach(t=>s.topics.push({id:"t"+(s.seq++),s:id,t:t,pm:60,l:"",pd:null,pp:null,rv:[]}));
-  });
-  return s;
-}
 function normCourse(s){
   if(!s||!Array.isArray(s.topics)||!Array.isArray(s.subs)||!Array.isArray(s.hours)||s.hours.length!==7)return null;
   if(!s.start)s.start=today();
@@ -96,7 +70,7 @@ function normCourse(s){
   if(!Array.isArray(s.rt))s.rt=[];
   if(!Array.isArray(s.sm))s.sm=[];
   s.al=s.al||60;s.ah=s.ah||85;s.pf=s.pf||25;s.ps=s.ps||5;s.pl=s.pl||15;
-  if(!s.n)s.n="Magistratura estadual (exemplo)";
+  if(!s.n)s.n="Meu curso";
   if(!s.seq)s.seq=s.topics.length+1;
   if(!s.sq)s.sq=s.subs.length+1;
   s.subs.forEach((x,i)=>{if(!x.id)x.id="s"+i;if(x.c==null)x.c=x.b?x.b-1:i%6;delete x.b});
@@ -114,7 +88,7 @@ function loadLocal(){
   }catch(e){}
   let c=null;
   try{c=normCourse(JSON.parse(localStorage.getItem(OLDKEY)))}catch(e){}
-  const fresh=!c;c=c||exampleCourse();
+  const fresh=!c;c=c||emptyCourse("Meu curso");
   return {v:3,cur:"c1",list:[{id:"c1",n:c.n}],stamp:fresh?0:Date.now(),base:0,sync:{},courses:{c1:c}};
 }
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(L))}catch(e){}}
@@ -538,7 +512,7 @@ function grouped(list,o){
 function vHoje(){
   const t0=today(),all=allTasks(),pend=all.filter(x=>!x.done);
   if(!S.topics.length&&!(S.sm||[]).length&&!(S.rt||[]).length)return '<section class="card note"><h2>Bem-vindo ao curso '+esc(S.n)+"</h2><div>Três passos para montar o cronograma:</div>"+
-    '<div class="topic"><span><b>1.</b> Cadastre as matérias e as aulas de cada uma. Dá para colar a lista de títulos do curso.</span><button type="button" class="btn sm" data-act="goto" data-tab="materias">Abrir Matérias</button></div>'+
+    '<div class="topic"><span><b>1.</b> Traga as matérias e aulas do seu curso: copie a página do curso na plataforma e cole no app, que separa tudo para você conferir.</span><button type="button" class="btn sm" data-act="goimp">Importar do curso</button></div>'+
     '<div class="topic"><span><b>2.</b> Informe as horas disponíveis por dia e a data de início.</span><button type="button" class="btn sm ghost" data-act="goto" data-tab="ajustes">Abrir Ajustes</button></div>'+
     '<div class="topic"><span><b>3.</b> Volte aqui: as tarefas do dia aparecem nesta aba, e o cronograma se reorganiza sozinho quando algo atrasa.</span></div>'+
     '<div class="muted">Se alguém te passou um código de curso, cole em Ajustes, na seção Backup e compartilhamento.</div></section>';
@@ -677,9 +651,111 @@ function weakCard(){
       return '<div class="topic"><span>'+esc(w.t.t)+' <span class="st">'+esc(s.n)+" · "+w.p+"% em "+w.n+' questões</span></span><button type="button" class="btn sm ghost" data-act="again" data-id="'+w.t.id+'"'+(has?" disabled":"")+">"+(has?"Reforço agendado":"Agendar reforço")+"</button></div>";
     }).join("")+"</section>";
 }
+/* ---------- importar curso colando o conteúdo da página ---------- */
+const fold=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const RX_DUR=/\(?\s*(\d{1,2}\s*h(oras?)?\s*\d{0,2}\s*(m(in(utos)?)?)?|\d{1,3}\s*min(utos)?|\d{1,2}:\d{2}(:\d{2})?)\s*\)?/gi;
+const RX_LESSON=/^(aula|video\s?aula|pdf|livro digital|apostila|capitulo|cap\.|modulo|unidade|topico|meta|parte|bloco|encontro|semana|licao)\b\s*(n[ºo°.]?\s*)?[\divxlc]*\s*([-–—:.)|]|$|\s)/;
+const RX_NUM=/^(\d{1,3}|[ivxlc]{1,6})\s*[-–—.):]\s*\S/;
+const RX_NOISE=[
+  /^(assistir|baixar|download|ver (mais|menos|tudo)|concluid[oa]s?|nao iniciad[oa]|em andamento|iniciar|continuar|retomar|marcar( como)?|favoritar|compartilhar|curtir|comentarios?|avaliar|progresso|anotacoes|duvidas?|forum|abrir|acessar|voltar|proxim[oa]|anterior|menu|inicio|home|sair|buscar|pesquisar|filtrar|ordenar)\b/,
+  /^(pdf|video|videos|questoes?|resumo|mapa mental|mapas mentais|slides?|audio|audios|material( de apoio)?|materiais|arquivos?|anexos?|exercicios?|simulado|gabarito)s?$/,
+  /^\d+\s*%$/,/^\d+\s*(de|\/)\s*\d+$/,
+  /^\d+\s*(aulas?|videos?|videoaulas?|pdfs?|arquivos?|itens?|questoes|materiais|topicos)(\s+\S+)?$/,
+  /^[\d\s:hm%().,/-]+$/,
+  /^(professor|professora|prof\.|por)\b/,
+  /^(atualizad[oa]|publicad[oa]|disponivel|lancamento|novo|nova)\b/
+];
+function cleanLine(s){
+  s=s.replace(/[ \t]+/g," ").replace(/^[\s•●○◦▪▫■□✓✔☐☑✅▶►▸>*·-]+/,"").replace(RX_DUR," ").replace(/\s{2,}/g," ").trim();
+  return s.replace(/[\s|·•–—-]+$/,"").trim();
+}
+const isNoise=s=>{const f=fold(s);return f.length<3||RX_NOISE.some(r=>r.test(f))};
+const isLesson=s=>{const f=fold(s);return RX_LESSON.test(f)||RX_NUM.test(f)};
+const bareLesson=s=>/^(aula|video\s?aula|pdf|livro digital|capitulo|modulo|unidade|meta|parte|bloco)\s*(n[ºo°.]?\s*)?[\divxlc]+\s*[-–—:.]?$/.test(fold(s));
+const subjHint=s=>/^#/.test(s)||/:$/.test(s)||/^(materia|disciplina|curso|conteudo)\s*:/.test(fold(s))||(s.length>=4&&s===s.toUpperCase()&&/[A-ZÀ-Ý]{3}/.test(s));
+const SMALL=new Set(["de","da","do","das","dos","e","a","o","em","na","no","nas","nos","para","por","com"]);
+const titleCase=s=>s.toLowerCase().split(" ").map((w,i)=>i&&SMALL.has(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+const subjName=s=>{s=s.replace(/^#+\s*/,"").replace(/^(mat[eé]ria|disciplina|conte[uú]do)\s*:\s*/i,"").replace(/:$/,"").trim();return s===s.toUpperCase()&&/[A-ZÀ-Ý]{3}/.test(s)?titleCase(s):s};
+// Lê o texto colado e devolve no formato de edição: "# Matéria" seguido das aulas, uma por linha.
+function recognize(raw){
+  const items=[];let prev="";
+  raw.split(/\r?\n/).forEach(l=>{
+    const c=cleanLine(l);
+    if(!c||isNoise(c)||fold(c)===fold(prev))return;
+    prev=c;items.push({t:c.slice(0,120),les:isLesson(c),hint:subjHint(c)});
+  });
+  const subs=[];let cur=null;
+  const add=n=>{cur={n:subjName(n).slice(0,60)||"Matéria",ls:[]};subs.push(cur)};
+  const anyLesson=items.some(x=>x.les);
+  items.forEach((x,i)=>{
+    const nx=items[i+1];
+    if(anyLesson){
+      if(x.les){
+        if(!cur)add("Matéria 1");
+        cur.ls.push(x.t);return;
+      }
+      const last=cur&&cur.ls.length?cur.ls[cur.ls.length-1]:"";
+      if(last&&bareLesson(last)&&!x.hint){cur.ls[cur.ls.length-1]=(last.replace(/[-–—:.\s]+$/,"")+" - "+x.t).slice(0,120);return}
+      if(x.hint||!cur||(nx&&nx.les)||!nx)add(x.t);
+      else cur.ls.push(x.t);
+    }else{
+      if(x.hint||!cur)add(x.t);else cur.ls.push(x.t);
+    }
+  });
+  return subs.filter(s=>s.ls.length||subs.length===1).map(s=>"# "+s.n+"\n"+s.ls.join("\n")).join("\n\n");
+}
+function parseNorm(txt){
+  const subs=[];let cur=null;
+  txt.split(/\r?\n/).forEach(l=>{
+    const t=l.trim();if(!t)return;
+    if(t.charAt(0)==="#"){cur={n:t.replace(/^#+\s*/,"").slice(0,60)||"Matéria",ls:[]};subs.push(cur)}
+    else{if(!cur){cur={n:"Matéria 1",ls:[]};subs.push(cur)}cur.ls.push(t.slice(0,120))}
+  });
+  return subs;
+}
+function impCard(){
+  const I=ui.imp;
+  if(!I||I.step===0){
+    return '<section class="card" id="imp">'+tog("imp","Importar do seu curso",!!I,"")+(I?'<div class="muted">Abra a página do curso na plataforma (Gran, Estratégia ou outra) com a lista de matérias e aulas, selecione tudo (Ctrl+A), copie (Ctrl+C) e cole aqui. Se o curso tiver uma página por matéria, cole uma de cada vez. O app tenta separar matérias e aulas, e você confere antes de adicionar.</div>'+
+      '<label class="field">Conteúdo copiado da página do curso<textarea id="i-raw" style="min-height:160px" placeholder="Cole aqui o texto da página do curso">'+esc(I.raw||"")+'</textarea></label>'+
+      '<div class="row"><button type="button" class="btn" data-act="imp-read">Reconhecer matérias e aulas</button>'+(I.msg?'<span class="muted">'+esc(I.msg)+"</span>":"")+"</div>":"")+"</section>";
+  }
+  const subs=parseNorm(I.norm),tot=subs.reduce((n,s)=>n+s.ls.length,0),empty=subs.filter(s=>!s.ls.length).length;
+  const ex=new Set(S.subs.map(s=>fold(s.n)));
+  return '<section class="card" id="imp">'+tog("imp","Importar do seu curso · conferir",true,"")+
+    '<div class="big">'+subs.length+" <small>"+(subs.length===1?"matéria":"matérias")+" e "+tot+" "+(tot===1?"aula reconhecidas":"aulas reconhecidas")+"</small></div>"+
+    '<div class="muted">Confira e corrija no texto abaixo: cada linha que começa com # é uma matéria, e as linhas seguintes são as aulas dela. Apague o que não for aula, junte ou separe matérias à vontade.</div>'+
+    '<label class="field">Matérias e aulas<textarea id="i-norm" style="min-height:260px;font-family:ui-monospace,Consolas,monospace">'+esc(I.norm)+"</textarea></label>"+
+    '<div class="row"><button type="button" class="btn sm ghost" data-act="imp-refresh">Atualizar a contagem</button></div>'+
+    (subs.length?'<div class="facts">'+subs.map(s=>"<span>"+esc(s.n)+" <b>"+s.ls.length+"</b>"+(ex.has(fold(s.n))?" · já existe, as aulas serão somadas":"")+"</span>").join("")+"</div>":"")+
+    (empty?'<div class="muted">'+empty+(empty===1?" matéria está":" matérias estão")+" sem aulas e "+(empty===1?"será ignorada":"serão ignoradas")+".</div>":"")+
+    '<div class="form"><label class="field">Minutos por PDF<input type="number" id="i-pm" value="'+(I.pm||60)+'" min="5" max="600" inputmode="numeric"></label>'+
+    '<label class="field">Adicionar em<select id="i-dest"><option value="cur"'+(I.dest!=="new"?" selected":"")+">Curso atual ("+esc(S.n)+')</option><option value="new"'+(I.dest==="new"?" selected":"")+">Um curso novo</option></select></label>"+
+    '<label class="field full" id="i-new-w"'+(I.dest==="new"?"":" hidden")+'>Nome do curso novo<input type="text" id="i-new" value="'+esc(I.cn||"")+'" maxlength="60"></label></div>'+
+    '<div class="row"><button type="button" class="btn" data-act="imp-go"'+(tot?"":" disabled")+'>Adicionar ao cronograma</button><button type="button" class="btn ghost" data-act="imp-back">Voltar e colar de novo</button><button type="button" class="btn ghost" data-act="imp-cancel">Cancelar</button></div>'+
+    (I.msg?'<div class="muted">'+esc(I.msg)+"</div>":"")+"</section>";
+}
+function impApply(subs,pm,target){
+  let n=0;
+  subs.forEach(s=>{
+    if(!s.ls.length)return;
+    let sub=target.subs.find(x=>fold(x.n)===fold(s.n));
+    if(!sub){sub={id:"s"+(target.sq++),n:s.n,c:target.subs.length%6,w:1};target.subs.push(sub)}
+    s.ls.forEach(t=>{target.topics.push({id:"t"+(target.seq++),s:sub.id,t:t,pm:pm,l:"",pd:null,pp:null,rv:[]});n++});
+  });
+  return n;
+}
 function vMaterias(){
   const act=activeSubs(),by=pendingBySub();
   let h=perfCard()+weakCard()+'<section class="card"><h2>Ordem de preferência</h2><div class="muted">As '+S.na+" primeiras matérias com aula pendente ficam em estudo. Quando uma termina, a próxima da ordem entra sozinha. Arraste pelo ⠿ ou use as setas para mudar a ordem.</div>";
+  if(S.subs.length){
+    if(!ui.del)h+='<div class="row"><button type="button" class="btn sm ghost" data-act="delmode">Excluir várias matérias</button></div>';
+    else{
+      const sel=S.subs.filter(s=>ui.del[s.id]),nl=S.topics.filter(t=>ui.del[t.s]).length;
+      h+='<div class="card note"><div>Marque as matérias que quer excluir. As aulas delas saem junto.</div><div class="row"><button type="button" class="btn sm ghost" data-act="delall">'+(sel.length===S.subs.length?"Desmarcar todas":"Marcar todas")+'</button>'+
+        '<button type="button" class="btn sm danger" data-act="delsel"'+(sel.length?"":" disabled")+'>'+(ui.confirm==="delsel"?"Confirmar: excluir "+sel.length+(sel.length===1?" matéria":" matérias")+" e "+nl+(nl===1?" aula":" aulas"):"Excluir "+sel.length+(sel.length===1?" selecionada":" selecionadas"))+'</button><button type="button" class="btn sm ghost" data-act="delmode">Cancelar</button></div></div>';
+    }
+  }
   let pos=0;
   if(!S.subs.length)h+='<div class="muted">Nenhuma matéria cadastrada ainda.</div>';
   S.subs.forEach((s,i)=>{
@@ -687,9 +763,10 @@ function vMaterias(){
     const pct=tot?Math.round(dn/tot*100):0,open=ui.openSub===s.id,ac=subAcc(s.id);
     const st=!tot?["","sem aulas"]:!by[s.id].length?(ts.some(t=>!t.pd)?["on","reestudo na fila"]:["","aulas concluídas"]):act.includes(s.id)?["on","em estudo"]:["",(++pos)+"ª da fila"];
     const ap=ac.n?pct100(ac.c,ac.n):-1;
-    h+='<div class="subj k'+s.c+'" data-sid="'+s.id+'"><div class="subj-top"><span class="grip" data-grip="'+s.id+'" aria-hidden="true">⠿</span><button type="button" class="subj-h" data-act="open" data-s="'+s.id+'" aria-expanded="'+open+'"><span class="sw"></span><span class="subj-info"><b>'+esc(s.n)+'</b><span class="badge '+st[0]+'">'+st[1]+'</span><span class="count">'+dn+"/"+tot+" aulas</span>"+
+    h+='<div class="subj k'+s.c+'" data-sid="'+s.id+'"><div class="subj-top">'+(ui.del?'<input type="checkbox" class="pick" data-pick="'+s.id+'" aria-label="Selecionar '+esc(s.n)+'"'+(ui.del[s.id]?" checked":"")+'>':'<span class="grip" data-grip="'+s.id+'" aria-hidden="true">⠿</span>')+'<button type="button" class="subj-h" data-act="open" data-s="'+s.id+'" aria-expanded="'+open+'"><span class="sw"></span><span class="subj-info"><b>'+esc(s.n)+'</b><span class="badge '+st[0]+'">'+st[1]+'</span><span class="count">'+dn+"/"+tot+" aulas</span>"+
        (ap>=0?'<span class="badge'+(ap<(S.al||60)?" low":"")+'">'+ap+"% de acerto em "+ac.n+" questões</span>":"")+"</span></button>"+
-       '<span class="ord"><button type="button" class="btn sm ghost" data-act="up" data-s="'+s.id+'" aria-label="Subir '+esc(s.n)+'"'+(i===0?" disabled":"")+'>↑</button><button type="button" class="btn sm ghost" data-act="down" data-s="'+s.id+'" aria-label="Descer '+esc(s.n)+'"'+(i===S.subs.length-1?" disabled":"")+'>↓</button></span></div><div class="bar"><i style="width:'+pct+'%"></i></div>';
+       '<span class="ord"><button type="button" class="btn sm ghost" data-act="up" data-s="'+s.id+'" aria-label="Subir '+esc(s.n)+'"'+(i===0?" disabled":"")+'>↑</button><button type="button" class="btn sm ghost" data-act="down" data-s="'+s.id+'" aria-label="Descer '+esc(s.n)+'"'+(i===S.subs.length-1?" disabled":"")+'>↓</button><button type="button" class="btn sm ghost" data-act="delsub" data-s="'+s.id+'" aria-label="Excluir '+esc(s.n)+'">✕</button></span></div><div class="bar"><i style="width:'+pct+'%"></i></div>';
+    if(ui.confirm==="del"+s.id)h+='<div class="card crit"><div><b>Excluir '+esc(s.n)+'?</b> '+(tot?(tot===1?"Sai também a única aula":"Saem também as "+tot+" aulas")+(dn?", incluindo "+dn+(dn===1?" já estudada":" já estudadas")+", com revisões, questões e acertos":"")+".":"A matéria não tem aulas.")+' Se for engano, use Desfazer logo em seguida.</div><div class="row"><button type="button" class="btn danger" data-act="delsub-ok" data-s="'+s.id+'">Excluir</button><button type="button" class="btn ghost" data-act="delsub-no">Cancelar</button></div></div>';
     if(open){
       h+='<div class="form"><label class="field">Nome da matéria<input type="text" id="s-name" data-sn="'+s.id+'" value="'+esc(s.n)+'" maxlength="60"></label>'+
          '<label class="field">Aulas por rodada (peso)<select id="s-w" data-w="'+s.id+'">'+[1,2,3].map(w=>'<option value="'+w+'"'+((s.w||1)===w?" selected":"")+">"+w+"</option>").join("")+"</select></label></div>";
@@ -707,12 +784,13 @@ function vMaterias(){
         }
       });
       const ck="clear"+s.id,zk="zero"+s.id;
-      h+='<div class="row">'+(dn?'<button type="button" class="btn sm danger" data-act="zerosub" data-s="'+s.id+'">'+(ui.confirm===zk?"Confirmar: desmarcar tudo desta matéria":"Zerar progresso desta matéria")+"</button>":"")+(ts.length?'<button type="button" class="btn sm danger" data-act="clear" data-s="'+s.id+'">'+(ui.confirm===ck?"Confirmar: remover aulas não estudadas":"Remover aulas não estudadas desta matéria")+"</button>":
-         '<button type="button" class="btn sm danger" data-act="delsub" data-s="'+s.id+'">Excluir matéria</button>')+"</div>";
+      h+='<div class="row">'+(dn?'<button type="button" class="btn sm danger" data-act="zerosub" data-s="'+s.id+'">'+(ui.confirm===zk?"Confirmar: desmarcar tudo desta matéria":"Zerar progresso desta matéria")+"</button>":"")+(ts.length&&dn?'<button type="button" class="btn sm danger" data-act="clear" data-s="'+s.id+'">'+(ui.confirm===ck?"Confirmar: remover aulas não estudadas":"Remover aulas não estudadas desta matéria")+"</button>":"")+
+         '<button type="button" class="btn sm danger" data-act="delsub" data-s="'+s.id+'">Excluir matéria</button>'+"</div>";
     }
     h+="</div>";
   });
   h+="</section>";
+  h+=impCard();
   h+='<section class="card"><h2>Cadastrar matéria e aulas</h2><div class="muted">Cole os títulos das aulas do curso, um por linha, ou deixe a lista vazia e informe só a quantidade.</div><div class="form">'+
     '<label class="field full">Matéria<select id="a-sub">'+S.subs.map(s=>'<option value="'+s.id+'">'+esc(s.n)+"</option>").join("")+'<option value="new"'+(S.subs.length?"":" selected")+'>Nova matéria…</option></select></label>'+
     '<label class="field full" id="a-new-w"'+(S.subs.length?" hidden":"")+'>Nome da nova matéria<input type="text" id="a-new" maxlength="60"></label>'+
@@ -937,6 +1015,10 @@ app.addEventListener("change",e=>{
     const s=subOf(el.dataset.sn),v=el.value.trim();if(s&&v){s.n=v;commit()}
   }else if(el.dataset.w!=null){
     const s=subOf(el.dataset.w);if(s){s.w=clamp(parseInt(el.value,10)||1,1,3);commit()}
+  }else if(el.dataset.pick){
+    if(ui.del){if(el.checked)ui.del[el.dataset.pick]=1;else delete ui.del[el.dataset.pick];ui.confirm=null;render()}
+  }else if(el.id==="i-dest"){
+    if(ui.imp){ui.imp.dest=el.value;$("i-new-w").hidden=el.value!=="new"}
   }else if(el.id==="a-sub"){
     $("a-new-w").hidden=el.value!=="new";
   }
@@ -944,7 +1026,7 @@ app.addEventListener("change",e=>{
 app.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");if(!b||b.disabled)return;
   const a=b.dataset.act,sid=b.dataset.s;
-  if(["clear","zerosub","zerot","reset","delcourse","rules-ask","rules-apply"].indexOf(a)<0)ui.confirm=null;
+  if(["clear","zerosub","zerot","reset","delcourse","rules-ask","rules-apply","delsub","delsel"].indexOf(a)<0)ui.confirm=null;
   ui.msg="";
   if(a==="wk"){ui.wk=Math.max(0,ui.wk+(+b.dataset.n));render()}
   else if(a==="gsync"){if(tok&&Date.now()<tokExp)sync();else signIn()}
@@ -992,9 +1074,46 @@ app.addEventListener("click",e=>{
     if(ui.confirm!==zk){ui.confirm=zk;render()}
     else{ui.confirm=null;ui.edit=null;resetTopic(t);commit()}
   }
-  else if(a==="delsub"){
-    if(!S.topics.some(t=>t.s===sid)){S.subs=S.subs.filter(s=>s.id!==sid);ui.openSub=null;commit()}
+  else if(a==="delsub"){ui.confirm=ui.confirm==="del"+sid?null:"del"+sid;render()}
+  else if(a==="delsub-no"){render()}
+  else if(a==="delsub-ok"){
+    S.subs=S.subs.filter(s=>s.id!==sid);S.topics=S.topics.filter(t=>t.s!==sid);
+    if(ui.openSub===sid)ui.openSub=null;commit();
   }
+  else if(a==="delmode"){ui.del=ui.del?null:{};render()}
+  else if(a==="delall"){const all=S.subs.every(s=>ui.del&&ui.del[s.id]);ui.del={};if(!all)S.subs.forEach(s=>{ui.del[s.id]=1});render()}
+  else if(a==="delsel"){
+    if(!ui.del)return;
+    if(ui.confirm!=="delsel"){ui.confirm="delsel";render();return}
+    const d=ui.del;ui.confirm=null;ui.del=null;
+    S.subs=S.subs.filter(s=>!d[s.id]);S.topics=S.topics.filter(t=>!d[t.s]);
+    if(ui.openSub&&d[ui.openSub])ui.openSub=null;commit();
+  }
+  else if(a==="goimp"){
+    ui.tab="materias";ui.imp={step:0};try{location.hash="materias"}catch(err){}render();
+    try{$("imp").scrollIntoView({block:"start"})}catch(err){}
+  }
+  else if(a==="imp"){ui.imp=ui.imp?null:{step:0};render()}
+  else if(a==="imp-read"){
+    const raw=$("i-raw").value,norm=recognize(raw);
+    if(!norm.trim())ui.imp={step:0,raw:raw,msg:"Não encontrei matérias nem aulas nesse texto. Confira se copiou a página com a lista do curso."};
+    else ui.imp={step:1,raw:raw,norm:norm,pm:60,dest:"cur"};
+    render();try{$("imp").scrollIntoView({block:"start"})}catch(err){}
+  }
+  else if(a==="imp-refresh"||a==="imp-go"){
+    const I=ui.imp;if(!I)return;
+    I.norm=$("i-norm").value;I.pm=clamp(num("i-pm",60),5,600);I.dest=$("i-dest").value;I.cn=$("i-new").value.trim();I.msg="";
+    if(a==="imp-refresh"){render();return}
+    const subs=parseNorm(I.norm);
+    if(!subs.some(s=>s.ls.length)){I.msg="Não há aulas para adicionar.";render();return}
+    if(I.dest==="new"){
+      if(!I.cn){I.msg="Dê um nome ao curso novo.";render();try{$("i-new").focus()}catch(err){}return}
+      const c=emptyCourse(I.cn);impApply(subs,I.pm,c);ui.imp=null;addCourse(c);
+    }else{impApply(subs,I.pm,S);ui.imp=null;commit()}
+    ui.tab="materias";try{location.hash="materias"}catch(err){}render();window.scrollTo(0,0);
+  }
+  else if(a==="imp-back"){ui.imp={step:0,raw:ui.imp?ui.imp.raw:""};render()}
+  else if(a==="imp-cancel"){ui.imp=null;render()}
   else if(a==="add"){
     let si=$("a-sub").value;
     if(si==="new"){
@@ -1126,7 +1245,7 @@ const hashTab=()=>{const h=location.hash.replace("#","");return TABS.includes(h)
 $("nav").addEventListener("click",e=>{
   const b=e.target.closest("button[data-tab]");if(!b)return;
   if(ui.tab==="ajustes"&&ui.sec.regras&&$("f-na"))ui.draft=readDraft();
-  ui.tab=b.dataset.tab;ui.confirm=null;ui.msg="";
+  ui.tab=b.dataset.tab;ui.confirm=null;ui.msg="";ui.del=null;
   try{location.hash=ui.tab}catch(err){}
   render();window.scrollTo(0,0);
 });
